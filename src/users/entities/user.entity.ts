@@ -1,26 +1,31 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Role } from '../../../utils/enum';
+import { Task } from 'src/tasks/entities/task.entity';
 
-@Entity({name: 'users'})
+@Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({type: 'varchar', length: '150', nullable: true})
+  @Column({ type: 'varchar', length: '150', nullable: true })
   username?: string;
 
-  @Column({type: 'varchar', length: '150', unique: true})
+  @Column({ type: 'varchar', length: '150', unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: '150', nullable: false})
+  @Column({ type: 'varchar', length: '150', nullable: false })
   password: string;
 
-  @Column({type: 'enum', enum: Role, default: Role.USER})
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role;
 
-  @Column({type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
+  @OneToMany(() => Task, (task) => task.user)
+  tasks: Task[];
+
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP'})
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 }
