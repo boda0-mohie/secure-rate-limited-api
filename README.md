@@ -26,6 +26,18 @@ A secure, production-ready REST API built with NestJS, featuring JWT authenticat
     npm install
     npm run start:dev
 
+## Environment Variables
+PORT=3000
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=secure_api
+JWT_SECRET=super_secret_key
+JWT_EXPIRES_IN=1d
+
+Create a `.env` file in the root directory:
+
 ## API Endpoints
 
 ### Auth & Users
