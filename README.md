@@ -1,41 +1,54 @@
 # Secure Rate-Limited API
 
-## Description
-A secure backend API for task management with JWT authentication, rate limiting, and audit logging.
+A secure, production-ready REST API built with NestJS, featuring JWT authentication, global rate limiting, and comprehensive audit logging.
 
 ## Tech Stack
-- Backend Framework: NestJS
-- Database: PostgreSQL
-- ORM: TypeORM
-- Auth: JWT + Passport
-- Validation: class-validator
-- Rate Limiting: @nestjs/throttler
+
+- **Framework:** [NestJS](https://nestjs.com/)
+- **Language:** TypeScript
+- **Database:** PostgreSQL
+- **ORM:** TypeORM
+- **Authentication:** Passport + JWT
+- **Rate Limiting:** @nestjs/throttler
+- **Validation:** class-validator
 
 ## Features
-- User authentication (JWT)
-- Rate limiting (5 requests per minute)
-- Task management
-- Action logging
 
-## Database Design (ERD)
+- **Secure Authentication:** User registration and login with JWT issuance.
+- **Task Management:** CRUD operations for user-specific tasks.
+- **Rate Limiting:** Global limit of 5 requests per minute per IP to prevent abuse.
+- **Audit Logging:** Internal logging of critical actions (e.g., login, task creation).
+- **Data Integrity:** Relationships between Users, Tasks, and Logs.
 
-The database schema is designed to ensure scalability, security, and clear relationships between entities.
+## Installation
 
-### Entities
-- **Users**: Stores user authentication and authorization data.
-- **Tasks**: Represents tasks created and managed by users.
-- **Logs**: Stores audit logs for critical user actions (e.g., login, task creation, deletion).
+    git clone <repository-url>
+    npm install
+    npm run start:dev
+
+## API Endpoints
+
+### Auth & Users
+- `POST /api/users/auth/register` - Register a new user
+- `POST /api/users/auth/login` - Login and receive access token
+- `GET /api/users/me` - Retrieve current user profile (requires Token)
+
+### Tasks
+- `POST /api/tasks/create-task` - Create a new task
+- `GET /api/tasks/my-tasks` - Retrieve all tasks for the current user
+- `GET /api/tasks/my-tasks/:id` - Retrieve a specific task
+- `PATCH /api/tasks/update-task/:id` - Update a task
+- `DELETE /api/tasks/delete-task/:id` - Delete a task
+
+## Database Design
 
 ### Relationships
-- One user can have multiple tasks.
-- One user can generate multiple logs.
-- Each task can be associated with multiple logs.
-
-## Database Design (ERD)
-
-The following diagram illustrates the relationships between Users, Tasks, and Logs.
+- **Users**: Can have multiple Tasks and Log entries.
+- **Tasks**: Belong to one User.
+- **Logs**: Record actions related to Users and Tasks.
 
 ![Database ERD](./docs/secure-rate-limited-api-db.png)
 
-ERD Source:
-- https://dbdiagram.io/d/secure-rate-limited-api-db-697ea101bd82f5fce23ba997
+## License
+
+This project is UNLICENSED.
