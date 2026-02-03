@@ -61,6 +61,14 @@ Create a `.env` file in the root directory:
 
 ![Database ERD](./docs/secure-rate-limited-api-db.png)
 
+## Security Considerations
+
+- Passwords are hashed using bcrypt before storage.
+- JWT-based authentication with protected routes.
+- DTO-based validation to prevent malformed input.
+- Rate limiting to protect against brute-force attacks.
+- No sensitive data (passwords) returned in API responses.
+
 ## License
 
 This project is UNLICENSED.
