@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
@@ -7,10 +7,13 @@ import { ConfigService } from '@nestjs/config';
 import { UsersController } from './users.controller';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guards/auth.guard';
+import { LogsModule } from 'src/logs/logs.module';
 
 @Module({
   imports: [
+    LogsModule,
     TypeOrmModule.forFeature([User]),
+    forwardRef(() => LogsModule),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {

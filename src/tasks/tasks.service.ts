@@ -5,6 +5,8 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { UpdateTaskDto } from "./dtos/update-task.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UsersService } from "src/users/users.service";
+import { LogsService } from "src/logs/logs.service";
+import { LogAction } from "utils/enum";
 
 
 @Injectable()
@@ -12,7 +14,8 @@ export class TasksService {
     constructor(
         @InjectRepository(Task)
         private readonly taskRepository: Repository<Task>,
-        private readonly usersService: UsersService
+        private readonly usersService: UsersService,
+        private readonly logsService: LogsService
     ) { }
 
     /**
@@ -24,6 +27,12 @@ export class TasksService {
     public async create(createTaskDto: CreateTaskDto, userId: string): Promise<Task> {
         const user = await this.usersService.getCurrentUser(userId);
         const task = this.taskRepository.create({ ...createTaskDto, user });
+        await this.logsService.createLog({
+            action: LogAction.CREATE_TASK,
+            userId: user.id,
+            entity: 'Task',
+            entityId: task.id,
+        });
         return this.taskRepository.save(task);
     }
 
@@ -33,8 +42,14 @@ export class TasksService {
      * @returns An array of tasks belonging to the user.
      */
     public async findAllUserTasks(userId: string): Promise<Task[]> {
-        const user = await this.usersService.getCurrentUser(userId);
-        return this.taskRepository.find({ where: { user } });
+        const tasks = await this.taskRepository.find({ where: { user: { id: userId } } });
+        await this.logsService.createLog({
+            action: LogAction.READ_ALL_TASKS,
+            userId: userId,
+            entity: 'Task',
+            entityId: userId,
+        });
+        return tasks;
     }
 
     /**
@@ -45,11 +60,16 @@ export class TasksService {
      * @throws NotFoundException if the task is not found.
      */
     public async findOneUserTask(id: string, userId: string): Promise<Task> {
-        const user = await this.usersService.getCurrentUser(userId);
-        const task = await this.taskRepository.findOne({ where: {id} });
+        const task = await this.taskRepository.findOne({ where: {user: {id: userId}, id} });
         if (!task) {
             throw new NotFoundException(`Task not found`);
         }
+        await this.logsService.createLog({
+            action: LogAction.READ_TASK,
+            userId: userId,
+            entity: 'Task',
+            entityId: task.id,
+        });
         return task;
     }
 
@@ -65,9 +85,6 @@ export class TasksService {
         const {title, description, status} = updateTaskDto;
         const user = await this.usersService.getCurrentUser(userId);
         const task = await this.findOneUserTask(id, user.id);
-        if (!task) {
-            throw new NotFoundException(`Task not found`);
-        }
         if (title) {
             task.title = title;
         }
@@ -77,6 +94,12 @@ export class TasksService {
         if (status) {
             task.status = status;
         }
+        await this.logsService.createLog({
+            action: LogAction.UPDATE_TASK,
+            userId: user.id,
+            entity: 'Task',
+            entityId: task.id,
+        });
         return this.taskRepository.save(task);
     }
 
@@ -91,6 +114,12 @@ export class TasksService {
         const user = await this.usersService.getCurrentUser(userId);
         const task = await this.findOneUserTask(id, user.id);
         await this.taskRepository.remove(task);
+        await this.logsService.createLog({
+            action: LogAction.DELETE_TASK,
+            userId: user.id,
+            entity: 'Task',
+            entityId: task.id,
+        });
         return {
             message: "Task deleted successfully"
         }

@@ -5,12 +5,15 @@ import { UsersService } from './users.service';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { JWTPayloadType } from 'utils/type';
+import { LogsService } from 'src/logs/logs.service';
+import { LogAction } from 'utils/enum';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly logsService: LogsService
   ) { }
 
   /**
@@ -24,6 +27,13 @@ export class AuthService {
     const payload: JWTPayloadType = { sub: user.id, email: user.email };
 
     const token = this.jwtService.sign(payload);
+
+    await this.logsService.createLog({
+      action: LogAction.REGISTER,
+      userId: user.id,
+      entity: 'User',
+      entityId: user.id,
+    });
 
     return {
       accessToken: token,
@@ -60,6 +70,13 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload);
+
+    await this.logsService.createLog({
+      action: LogAction.LOGIN,
+      userId: user.id,
+      entity: 'User',
+      entityId: user.id,
+    });
 
     return {
       accessToken,

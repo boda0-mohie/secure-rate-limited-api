@@ -20,10 +20,7 @@ export class UsersService {
   public async createUser(registerDto: RegisterDto): Promise<User> {
     const { email, password, username } = registerDto;
 
-    const existingUser = await this.usersRepository.findOne({
-      where: { email },
-    });
-
+    const existingUser = await this.usersRepository.findOne({ where: { email } });
     if (existingUser) {
       throw new BadRequestException('Email already in use');
     }
@@ -43,7 +40,7 @@ export class UsersService {
   /**
    * Find user by email
    * @param email 
-   * @returns User object or null
+   * @returns User object
    */
   public async findByEmail(email: string): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { email } });
@@ -53,6 +50,11 @@ export class UsersService {
     return user;
   }
 
+  /**
+   * Get current user
+   * @param id 
+   * @returns User object
+   */
   public async getCurrentUser(id: string): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
